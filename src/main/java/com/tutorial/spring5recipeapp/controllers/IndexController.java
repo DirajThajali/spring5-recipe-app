@@ -1,38 +1,26 @@
 package com.tutorial.spring5recipeapp.controllers;
 
-import com.tutorial.spring5recipeapp.domain.Category;
-import com.tutorial.spring5recipeapp.domain.UnitOfMeasure;
-import com.tutorial.spring5recipeapp.repositories.CategoryRepository;
-import com.tutorial.spring5recipeapp.repositories.UnitOfMeasureRepository;
+import com.tutorial.spring5recipeapp.services.RecipeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.Optional;
 
 @Slf4j
 @Controller
 public class IndexController {
 
-    private final CategoryRepository categoryRepository;
+    private final RecipeService recipeService;
 
-    private final UnitOfMeasureRepository unitOfMeasureRepository;
-
-    public IndexController(CategoryRepository categoryRepository, UnitOfMeasureRepository unitOfMeasureRepository) {
-        this.categoryRepository = categoryRepository;
-        this.unitOfMeasureRepository = unitOfMeasureRepository;
+    public IndexController(RecipeService recipeService) {
+        this.recipeService = recipeService;
     }
 
     @RequestMapping({"", "/", "/index"})
-    public String getIndexPage() {
-        log.debug("getting index page");
-        log.debug("logger from Index Controller ######################################################");
-
-        Optional<Category> optionalCategory = categoryRepository.findByDescription("American");
-        Optional<UnitOfMeasure> optionalUnitOfMeasure = unitOfMeasureRepository.findByDescription("Ounce");
-
-        System.out.println("It should be 1: " + optionalCategory.get().getId());
-        System.out.println("It should be 5: " + optionalUnitOfMeasure.get().getId());
+    public String getIndexPage(Model model) {
+        log.debug("getting recipe page");
+        log.debug("logger from Recipe Controller ######################################################");
+        model.addAttribute("recipes", recipeService.getRecipes());
         return "index";
     }
 }

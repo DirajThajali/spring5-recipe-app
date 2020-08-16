@@ -1,12 +1,11 @@
 package com.tutorial.spring5recipeapp.controllers;
 
 import com.tutorial.spring5recipeapp.services.RecipeService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@Slf4j
 @Controller
 public class RecipeController {
 
@@ -16,11 +15,10 @@ public class RecipeController {
         this.recipeService = recipeService;
     }
 
-    @RequestMapping({"/recipe", "/recipe.html"})
-    public String listRecipes(Model model) {
-        log.debug("getting recipe page");
-        log.debug("logger from Recipe Controller ######################################################");
-        model.addAttribute("recipes", recipeService.getRecipes());
-        return "recipe/list";
+    @RequestMapping("recipe/show/{id}")
+    public String showById(@PathVariable String id, Model model) {
+        model.addAttribute("recipe", recipeService.findById(new Long(id)));
+
+        return "recipe/show";
     }
 }
