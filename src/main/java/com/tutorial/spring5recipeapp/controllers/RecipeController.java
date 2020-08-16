@@ -2,13 +2,12 @@ package com.tutorial.spring5recipeapp.controllers;
 
 import com.tutorial.spring5recipeapp.commands.RecipeCommand;
 import com.tutorial.spring5recipeapp.services.RecipeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @Controller
 public class RecipeController {
 
@@ -18,13 +17,17 @@ public class RecipeController {
         this.recipeService = recipeService;
     }
 
+    @GetMapping
     @RequestMapping("recipe/{id}/show")
     public String showById(@PathVariable String id, Model model) {
         model.addAttribute("recipe", recipeService.findById(Long.valueOf(id)));
 
+
+        log.debug("I am a debugger inside show recipe method");
         return "recipe/show";
     }
 
+    @GetMapping
     @RequestMapping("/recipe/new")
     public String newRecipe(Model model) {
         model.addAttribute("recipe", new RecipeCommand());
@@ -32,6 +35,7 @@ public class RecipeController {
         return "recipe/recipeform";
     }
 
+    @GetMapping
     @RequestMapping("/recipe/{id}/update")
     public String updateRecipe(@PathVariable String id, Model model) {
         model.addAttribute("recipe", recipeService.findCommandById(Long.valueOf(id)));
@@ -45,5 +49,14 @@ public class RecipeController {
         RecipeCommand savedCommand = recipeService.saveRecipeCommand(command);
 
         return "redirect:/recipe/" + savedCommand.getId() + "/show";
+    }
+
+    @GetMapping
+    @RequestMapping("recipe/{id}/delete")
+    public String deleteById(@PathVariable String id) {
+        log.debug("Deleting id: " + id);
+
+        recipeService.deleteById(Long.valueOf(id));
+        return "redirect:/";
     }
 }
