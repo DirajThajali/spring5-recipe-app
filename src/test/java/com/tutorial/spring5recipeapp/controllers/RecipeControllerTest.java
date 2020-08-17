@@ -44,7 +44,7 @@ class RecipeControllerTest {
 
         when(recipeService.findById(anyLong())).thenReturn(recipe);
 
-        mockMvc.perform(get("/recipe/show/1"))
+        mockMvc.perform(get("/recipe/1/show"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("recipe/show"))
                 .andExpect(model().attributeExists("recipe"));
@@ -81,9 +81,10 @@ class RecipeControllerTest {
         RecipeCommand command = new RecipeCommand();
         command.setId(1L);
 
-        when(recipeService.saveRecipeCommand(any())).thenReturn(command);
+        when(recipeService.findCommandById(anyLong())).thenReturn(command);
 
         mockMvc.perform(get("/recipe/1/update"))
+                .andExpect(status().isOk())
                 .andExpect(view().name("recipe/recipeform"))
                 .andExpect(model().attributeExists("recipe"));
 
