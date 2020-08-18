@@ -1,8 +1,10 @@
 package com.tutorial.spring5recipeapp.services;
 
+import com.tutorial.spring5recipeapp.commands.RecipeCommand;
 import com.tutorial.spring5recipeapp.converters.RecipeCommandToRecipe;
 import com.tutorial.spring5recipeapp.converters.RecipeToRecipeCommand;
 import com.tutorial.spring5recipeapp.domain.Recipe;
+import com.tutorial.spring5recipeapp.exceptions.NotFoundException;
 import com.tutorial.spring5recipeapp.repositories.RecipeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,8 +16,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class RecipeServiceImplTest {
@@ -62,6 +63,45 @@ class RecipeServiceImplTest {
 
         Recipe returnedRecipe = recipeService.findById(1L);
         assertNotNull(returnedRecipe, "Null recipe returned");
+        verify(recipeRepository, times(1)).findById(anyLong());
+        verify(recipeRepository, never()).findAll();
+    }
+
+    @Test
+    public void getRecipeByIdTestNotFound() throws Exception {
+
+        Optional<Recipe> recipeOptional = Optional.empty();
+
+        when(recipeRepository.findById(anyLong())).thenReturn(recipeOptional);
+
+        // this throws an error
+//        Recipe recipeReturned = recipeService.findById(1L);
+
+        NotFoundException notFoundException = assertThrows(NotFoundException.class,
+                () -> recipeService.findById(1L),
+                "Expected exception to throw an error. But it didn't");
+
+        assertTrue(notFoundException.getMessage().contains("Recipe Not Found"));
+        //should go boom
+    }
+
+
+    @Test
+    public void getRecipeCommandByIdTest() throws Exception {
+        Recipe recipe = new Recipe();
+        recipe.setId(1L);
+        Optional<Recipe> recipeOptional = Optional.of(recipe);
+
+        when(recipeRepository.findById(anyLong())).thenReturn(recipeOptional);
+
+        RecipeCommand recipeCommand = new RecipeCommand();
+        recipeCommand.setId(1L);
+
+        when(recipeToRecipeCommand.convert(any())).thenReturn(recipeCommand);
+
+        RecipeCommand commandById = recipeService.findCommandById(1L);
+
+        assertNotNull(commandById, "Null recipe returned");
         verify(recipeRepository, times(1)).findById(anyLong());
         verify(recipeRepository, never()).findAll();
     }
